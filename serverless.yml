@@ -1,0 +1,68 @@
+
+service: march-madness-calcutta-cognito
+
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+custom:
+  secrets: ${file(secrets.json)}
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  timeout: 15
+  region: us-east-1
+  stage: prod
+  profile: default
+  environment:
+    DB_NAME_DEV: ${self:custom.secrets.DB_NAME_DEV}
+    DB_USER_DEV: ${self:custom.secrets.DB_USER_DEV}
+    DB_PASSWORD_DEV: ${self:custom.secrets.DB_PASSWORD_DEV}
+    DB_HOST_DEV:
+      Fn::ImportValue: calcutta-db-dev-address
+    DB_PORT_DEV:
+      Fn::ImportValue: calcutta-db-dev-port
+    DB_NAME_PROD: ${self:custom.secrets.DB_NAME_PROD}
+    DB_USER_PROD: ${self:custom.secrets.DB_USER_PROD}
+    DB_PASSWORD_PROD: ${self:custom.secrets.DB_PASSWORD_PROD}
+    DB_HOST_PROD:
+      Fn::ImportValue: calcutta-db-prod-address
+    DB_PORT_PROD:
+      Fn::ImportValue: calcutta-db-prod-port
+    OLD_USER_POOL_ARN: ${self:custom.secrets.USER_POOL_ARN}
+    OLD_COGNITO_CLIENT_ID: ${self:custom.secrets.COGNITO_CLIENT_ID}
+  vpc:
+    securityGroupIds:
+      - Ref: LambdaSG
+    subnetIds:
+      - LambdaSubnet1
+      - LambdaSubnet2
+      - LambdaSubnet3
+
+functions:
+  addUserAfterSignup:
+    handler: auth/signup.addUserAfterSignup
+    events:
+      - cognitoUserPool:
+          pool: CalcuttaPool
+          trigger: PostConfirmation
+
+  migrateUser:
+    handler: auth/migration.migrateUser
+    events:
+      - cognitoUserPool:
+          pool: CalcuttaPool
+          trigger: UserMigration
+
+resources:
+  - ${file(resources/cognito.yml)}
+  - ${file(resources/internet-gateways.yml)}
+  - ${file(resources/route-tables.yml)}
+  - ${file(resources/security-groups.yml)}
+  - ${file(resources/subnets.yml)}
+  - ${file(resources/vpc.yml)}

@@ -1,0 +1,9 @@
+Resources:
+  LambdaRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: CalcuttaVPC
+      Tags:
+        - Key: Name
+          Value: 'lambda-to-internet'

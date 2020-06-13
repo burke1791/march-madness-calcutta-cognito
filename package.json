@@ -1,0 +1,31 @@
+{
+  "name": "march-madness-calcutta-cognito",
+  "version": "1.0.0",
+  "description": "AWS CloudFormation resources related to the user authentication",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/burke1791/march-madness-calcutta-cognito.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/burke1791/march-madness-calcutta-cognito/issues"
+  },
+  "homepage": "https://github.com/burke1791/march-madness-calcutta-cognito#readme",
+  "dependencies": {
+    "mssql": "^6.2.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.691.0",
+    "aws-sdk-mock": "^5.1.0",
+    "jest": "^26.0.1",
+    "serverless-bundle": "^1.7.0",
+    "serverless-dotenv-plugin": "^2.4.2",
+    "serverless-offline": "^6.4.0"
+  }
+}

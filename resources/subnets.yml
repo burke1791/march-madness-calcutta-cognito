@@ -1,0 +1,36 @@
+Resources:
+  LambdaSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.1.0.0/24
+      MapPublicIpOnLaunch: True
+      VpcId:
+        Ref: CalcuttaVPC
+      Tags:
+        - Key: Name
+          Value: lambda
+
+  LambdaSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.1.1.0/24
+      MapPublicIpOnLaunch: True
+      VpcId:
+        Ref: CalcuttaVPC
+      Tags:
+        - Key: Name
+          Value: lambda
+
+  LambdaSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1c
+      CidrBlock: 10.1.2.0/24
+      MapPublicIpOnLaunch: True
+      VpcId:
+        Ref: CalcuttaVPC
+      Tags:
+        - Key: Name
+          Value: lambda
