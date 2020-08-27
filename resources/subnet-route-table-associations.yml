@@ -1,0 +1,24 @@
+Resources:
+  AssocLambda1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: LambdaRouteTable
+      SubnetId:
+        Ref: LambdaSubnet1
+
+  AssocLambda2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: LambdaRouteTable
+      SubnetId:
+        Ref: LambdaSubnet2
+
+  AssocLambda3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: LambdaRouteTable
+      SubnetId:
+        Ref: LambdaSubnet3

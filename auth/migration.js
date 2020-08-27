@@ -3,7 +3,7 @@ import { callbackWaitsForEmptyEventLoopFalse } from '../utilities/common';
 
 const oldUserPoolConfig = {
   CLIENT_ID: process.env.OLD_COGNITO_CLIENT_ID,
-  USER_POOL_ID: process.env.OLD_USER_POOL_ARN,
+  USER_POOL_ID: process.env.OLD_USER_POOL_ID,
   REGION: 'us-east-1'
 };
 
@@ -13,18 +13,28 @@ export async function migrateUser(event, context, callback) {
   let username = event.userName;
   let password = event.request.password;
 
-  let result = await migrationAuthentication(username, password);
+  let user = await authenticateUser(username, password);
 
-  console.log(result);
+  if (user) {
+    event.response.userAttributes = {
+      email: user.email,
+      email_verified: true,
+      preferred_username: user.preferred_username
+    };
+    event.response.finalUserStatus = 'CONFIRMED';
+    event.response.messageAction = 'SUPPRESS';
 
-  callback(null, 'Bad password');
+    return event;
+  } else {
+    callback(null, 'Bad Password');
+  }
 }
 
-async function migrationAuthentication(username, password) {
-  const cisp = new AWS.CognitoIdentityServiceProvider();
+async function authenticateUser(username, password) {
+  const cisp = new AWS.CognitoIdentityServiceProvider({ region: 'us-east-1' });
 
   try {
-    const resAuth = await cisp.adminInitiateAuth({
+    let resAuth = await cisp.adminInitiateAuth({
       AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
       AuthParameters: {
         USERNAME: username,
@@ -34,25 +44,26 @@ async function migrationAuthentication(username, password) {
       UserPoolId: oldUserPoolConfig.USER_POOL_ID
     }).promise();
 
-    console.log(resAuth);
-
     if (resAuth.code && resAuth.message) {
       return undefined;
     }
 
-    const resGet = await cisp.adminGetUser({
+    let resGet = await cisp.adminGetUser({
       UserPoolId: oldUserPoolConfig.USER_POOL_ID,
       Username: username
     }).promise();
 
-    console.log(resGet);
-
     if (resGet.code && resGet.message) {
-      return resGet.UserAttributes;
+      return undefined;
     }
+
+    return {
+      sub: resGet.UserAttributes.find(e => e.Name === 'sub').Value,
+      email: resGet.UserAttributes.find(e => e.Name === 'email').Value,
+      preferred_username: resGet.UserAttributes.find(e => e.Name === 'preferred_username').Value
+    };
   } catch (error) {
     console.log(error);
+    return error;
   }
-
-  return undefined
 }

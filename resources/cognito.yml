@@ -1,16 +1,16 @@
 Resources:
-  CalcuttaPool:
+  CognitoUserPoolCalcuttaPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: calcutta-main
+      UserPoolName: calcutta-${self:custom.stage}
       AccountRecoverySetting:
         RecoveryMechanisms:
           - Name: verified_email
             Priority: 1
       AutoVerifiedAttributes:
         - email
-      DeviceConfiguration:
-        DeviceOnlyRememberedOnUserPrompt: True
+      UsernameAttributes:
+        - email
       VerificationMessageTemplate:
         DefaultEmailOption: CONFIRM_WITH_LINK
         EmailMessageByLink: 'Please click the link below to verify your email address. {##Verify Email##}'
@@ -35,11 +35,12 @@ Resources:
   CalcuttaPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: calcutta-main-client
+      ClientName: calcutta-client
       ExplicitAuthFlows:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_CUSTOM_AUTH
         - ALLOW_USER_SRP_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
       GenerateSecret: False
       PreventUserExistenceErrors: ENABLED
@@ -51,11 +52,4 @@ Resources:
         - preferred_username
       RefreshTokenValidity: 30
       UserPoolId:
-        Ref: CalcuttaPool
-
-Outputs:
-  CognitoPoolArn:
-    Value:
-      Fn::GetAtt: [ CalcuttaPool, Arn ]
-    Export:
-      Name: calcutta-user-pool-arn
+        Ref: CognitoUserPoolCalcuttaPool

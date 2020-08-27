@@ -2,10 +2,10 @@ Resources:
   LambdaSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: 'Lambda access to RDS'
+      GroupDescription: 'Lambda outbound'
       GroupName: LambdaDMZ
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       VpcId:
-        Ref: CalcuttaVPC
+        Ref: CalcuttaCognitoVPC

@@ -3,7 +3,7 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId:
-        Ref: CalcuttaVPC
+        Ref: CalcuttaCognitoVPC
       Tags:
         - Key: Name
-          Value: 'lambda-to-internet'
+          Value: 'Lambdas'

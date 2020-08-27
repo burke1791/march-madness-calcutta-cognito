@@ -11,38 +11,30 @@ plugins:
 
 custom:
   secrets: ${file(secrets.json)}
+  stage: ${opt:stage, self:provider.stage}
 
 provider:
   name: aws
   runtime: nodejs12.x
   timeout: 15
   region: us-east-1
-  stage: prod
+  stage: dev
   profile: default
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminGetUser
+        - cognito-idp:AdminInitiateAuth
+      Resource: arn:aws:cognito-idp:us-east-1:329156245350:userpool/us-east-1_tYI60pC3S
   environment:
-    DB_NAME_DEV: ${self:custom.secrets.DB_NAME_DEV}
-    DB_USER_DEV: ${self:custom.secrets.DB_USER_DEV}
-    DB_PASSWORD_DEV: ${self:custom.secrets.DB_PASSWORD_DEV}
-    DB_HOST_DEV:
-      Fn::ImportValue: calcutta-db-dev-address
-    DB_PORT_DEV:
-      Fn::ImportValue: calcutta-db-dev-port
-    DB_NAME_PROD: ${self:custom.secrets.DB_NAME_PROD}
-    DB_USER_PROD: ${self:custom.secrets.DB_USER_PROD}
-    DB_PASSWORD_PROD: ${self:custom.secrets.DB_PASSWORD_PROD}
-    DB_HOST_PROD:
-      Fn::ImportValue: calcutta-db-prod-address
-    DB_PORT_PROD:
-      Fn::ImportValue: calcutta-db-prod-port
-    OLD_USER_POOL_ARN: ${self:custom.secrets.USER_POOL_ARN}
+    DB_NAME: ${self:custom.secrets.${self:custom.stage}.DB_NAME}
+    DB_USER: ${self:custom.secrets.${self:custom.stage}.DB_USER}
+    DB_PASSWORD: ${self:custom.secrets.${self:custom.stage}.DB_PASSWORD}
+    DB_HOST: ${self:custom.secrets.${self:custom.stage}.DB_HOST}
+    DB_PORT: ${self:custom.secrets.${self:custom.stage}.DB_PORT}
+    ASSUMED_ROLE_ARN: arn:aws:iam::${self:custom.secrets.${self:custom.stage}.AWS_ACCOUNT_ID}:role/calcutta-${self:custom.stage}-assumed-role
+    OLD_USER_POOL_ID: ${self:custom.secrets.USER_POOL_ID}
     OLD_COGNITO_CLIENT_ID: ${self:custom.secrets.COGNITO_CLIENT_ID}
-  vpc:
-    securityGroupIds:
-      - Ref: LambdaSG
-    subnetIds:
-      - LambdaSubnet1
-      - LambdaSubnet2
-      - LambdaSubnet3
 
 functions:
   addUserAfterSignup:
@@ -51,6 +43,27 @@ functions:
       - cognitoUserPool:
           pool: CalcuttaPool
           trigger: PostConfirmation
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSG
+      subnetIds:
+        - Ref: LambdaSubnet1
+        - Ref: LambdaSubnet2
+        - Ref: LambdaSubnet3
+
+  syncUserInDatabase:
+    handler: auth/postAuth.syncUserInDatabase
+    events:
+      - cognitoUserPool:
+          pool: CalcuttaPool
+          trigger: PostAuthentication
+    vpc:
+      securityGroupIds:
+        - Ref: LambdaSG
+      subnetIds:
+        - Ref: LambdaSubnet1
+        - Ref: LambdaSubnet2
+        - Ref: LambdaSubnet3
 
   migrateUser:
     handler: auth/migration.migrateUser
@@ -58,11 +71,14 @@ functions:
       - cognitoUserPool:
           pool: CalcuttaPool
           trigger: UserMigration
-
+  
 resources:
   - ${file(resources/cognito.yml)}
-  - ${file(resources/internet-gateways.yml)}
-  - ${file(resources/route-tables.yml)}
-  - ${file(resources/security-groups.yml)}
-  - ${file(resources/subnets.yml)}
   - ${file(resources/vpc.yml)}
+  - ${file(resources/subnets.yml)}
+  - ${file(resources/security-groups.yml)}
+  - ${file(resources/route-tables.yml)}
+  - ${file(resources/subnet-route-table-associations.yml)}
+  - ${file(resources/internet-gateway.yml)}
+  - ${file(resources/routes.yml)}
+  - ${file(resources/roles.yml)}

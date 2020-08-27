@@ -6,7 +6,7 @@ Resources:
       CidrBlock: 10.1.0.0/24
       MapPublicIpOnLaunch: True
       VpcId:
-        Ref: CalcuttaVPC
+        Ref: CalcuttaCognitoVPC
       Tags:
         - Key: Name
           Value: lambda
@@ -18,7 +18,7 @@ Resources:
       CidrBlock: 10.1.1.0/24
       MapPublicIpOnLaunch: True
       VpcId:
-        Ref: CalcuttaVPC
+        Ref: CalcuttaCognitoVPC
       Tags:
         - Key: Name
           Value: lambda
@@ -30,7 +30,7 @@ Resources:
       CidrBlock: 10.1.2.0/24
       MapPublicIpOnLaunch: True
       VpcId:
-        Ref: CalcuttaVPC
+        Ref: CalcuttaCognitoVPC
       Tags:
         - Key: Name
           Value: lambda

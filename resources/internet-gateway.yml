@@ -10,6 +10,6 @@ Resources:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId:
-        Ref: CalcuttaVPC
+        Ref: CalcuttaCognitoVPC
       InternetGatewayId:
         Ref: CalcuttaInternetGateway

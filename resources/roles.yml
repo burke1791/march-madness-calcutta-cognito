@@ -1,0 +1,21 @@
+Resources:
+  CalcuttaVPCPeerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: calcutta-${self:custom.stage}-peer-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: ${self:custom.secrets.${self:custom.stage}.AWS_ACCOUNT_ID}
+            Action: 
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ec2:AcceptVpcPeeringConnection
+                Resource: '*'
