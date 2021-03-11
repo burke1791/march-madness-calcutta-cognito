@@ -1,0 +1,34 @@
+
+name: Stage
+
+on:
+  push:
+    branches: develop
+
+jobs:
+  base_deploy:
+    name: Deploy base service
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: use nodejs
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: npm install -g serverless
+      - run: npm install
+      - run: serverless deploy -s $STAGE_NAME
+  
+env:
+  STAGE_NAME: dev
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_HOST: ${{ secrets.DB_HOST_STAGE }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  AWS_PEER_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_STAGE }}
+  OLD_USER_POOL_ID: ${{ secrets.OLD_USER_POOL_ID }}
+  OLD_COGNITO_CLIENT_ID: ${{ secrets.OLD_COGNITO_CLIENT_ID }}
