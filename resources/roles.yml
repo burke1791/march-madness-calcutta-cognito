@@ -7,7 +7,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: ${self:custom.secrets.${self:custom.stage}.AWS_ACCOUNT_ID}
+              AWS: ${env:AWS_PEER_ACCOUNT_ID}
             Action: 
               - sts:AssumeRole
       Path: /
