@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/burke1791/march-madness-calcutta-cognito#readme",
   "dependencies": {
-    "mssql": "^8.0.2"
+    "mssql": "^9.0.1"
   },
   "devDependencies": {
     "aws-sdk": "^2.691.0",
