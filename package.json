@@ -18,14 +18,12 @@
   },
   "homepage": "https://github.com/burke1791/march-madness-calcutta-cognito#readme",
   "dependencies": {
-    "mssql": "^8.0.2"
+    "mssql": "^9.0.1"
   },
   "devDependencies": {
     "aws-sdk": "^2.691.0",
     "aws-sdk-mock": "^5.1.0",
     "jest": "^26.0.1",
-    "serverless-bundle": "^1.7.0",
-    "serverless-dotenv-plugin": "^2.4.2",
-    "serverless-offline": "^6.4.0"
+    "serverless-bundle": "^5.5.0"
   }
 }
