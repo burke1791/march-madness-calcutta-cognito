@@ -1,6 +1,6 @@
 {
   "name": "march-madness-calcutta-cognito",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "AWS CloudFormation resources related to the user authentication",
   "main": "index.js",
   "scripts": {
