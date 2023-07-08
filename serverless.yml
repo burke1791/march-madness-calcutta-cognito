@@ -20,7 +20,7 @@ provider:
       Action:
         - cognito-idp:AdminGetUser
         - cognito-idp:AdminInitiateAuth
-      Resource: arn:aws:cognito-idp:us-east-1:329156245350:userpool/us-east-1_tYI60pC3S
+      Resource: arn:aws:cognito-idp:us-east-1:329156245350:userpool/us-east-1_uOQeKJ4OE
   environment:
     DB_NAME: ${env:DB_NAME}
     DB_USER: ${env:DB_USER}
