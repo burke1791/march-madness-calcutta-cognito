@@ -14,7 +14,7 @@ export async function migrateUser(event, context, callback) {
   let password = event.request.password;
 
   // const lambdaParams = {
-  //   FunctionName: 
+  //   FunctionName:
   // }
 
   let user = await authenticateUser(username, password);
@@ -44,7 +44,7 @@ async function authenticateUser(username, password) {
     });
 
     console.log(creds);
-    
+
     let resAuth = await cisp.adminInitiateAuth({
       AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
       AuthParameters: {
