@@ -39,7 +39,8 @@ async function authenticateUser(username, password) {
 
   try {
     const assumedRole = await sts.assumeRole({
-      RoleArn: 'arn:aws:iam::329156245350:role/lambda-migrate-user'
+      RoleArn: 'arn:aws:iam::329156245350:role/lambda-migrate-user',
+      RoleSessionName: 'migrate-user'
     }).promise();
 
     const creds = assumedRole?.service?.config?.credentials;
