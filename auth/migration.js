@@ -43,10 +43,12 @@ async function authenticateUser(username, password) {
       RoleSessionName: 'migrate-user'
     }).promise();
 
-    const creds = assumedRole?.service?.config?.credentials;
+    const creds = assumedRole?.Credentials;
 
     console.log(assumedRole);
     console.log(creds);
+
+    if (creds == undefined) throw new Error('Credentials not acquired');
 
     const cisp = new AWS.CognitoIdentityServiceProvider({
       region: 'us-east-1',
