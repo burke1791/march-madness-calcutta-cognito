@@ -35,16 +35,25 @@ export async function migrateUser(event, context, callback) {
 }
 
 async function authenticateUser(username, password) {
-  const cisp = new AWS.CognitoIdentityServiceProvider({ region: 'us-east-1' });
   const sts = new AWS.STS();
 
   try {
-    const creds = sts.assumeRole({
+    const assumedRole = await sts.assumeRole({
       RoleArn: 'arn:aws:iam::329156245350:role/lambda-migrate-user'
-    });
+    }).promise();
 
+    const creds = assumedRole?.service?.config?.credentials;
+
+    console.log(assumedRole);
     console.log(creds);
 
+    const cisp = new AWS.CognitoIdentityServiceProvider({
+      region: 'us-east-1',
+      accessKeyId: creds?.AccessKeyId,
+      secretAccessKey: creds?.SecretAccessKey,
+      sessionToken: creds?.SessionToken
+    });
+    
     let resAuth = await cisp.adminInitiateAuth({
       AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
       AuthParameters: {
