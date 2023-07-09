@@ -20,24 +20,24 @@ jobs:
       - run: npm install
       - run: serverless deploy -s $STAGE_NAME
   
-  old_cognito:
-    name: Old cognito lookup
-    runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.OLD_COGNITO_ACCOUNT_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: $${{ secrets.OLD_COGNITO_ACCOUNT_SECRET_ACCESS_KEY }}
-      DB_HOST: hello
+  # old_cognito:
+  #   name: Old cognito lookup
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.OLD_COGNITO_ACCOUNT_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: $${{ secrets.OLD_COGNITO_ACCOUNT_SECRET_ACCESS_KEY }}
+  #     DB_HOST: hello
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: use nodejs
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - run: echo "DB_HOST - $DB_HOST"     # test
-      - run: npm install -g serverless
-      - run: npm install
-      - run: serverless deploy -s $STAGE_NAME --config=migration.yml
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: use nodejs
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 16
+  #     - run: echo "DB_HOST - $DB_HOST"     # test
+  #     - run: npm install -g serverless
+  #     - run: npm install
+  #     - run: serverless deploy -s $STAGE_NAME --config=migration.yml
   
 env:
   STAGE_NAME: stage
