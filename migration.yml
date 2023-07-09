@@ -1,0 +1,28 @@
+
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  timeout: 15
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminGetUser
+        - cognito-idp:AdminInitiateAuth
+      Resource: arn:aws:cognito-idp:us-east-1:329156245350:userpool/us-east-1_uOQeKJ4OE
+  environment:
+    USER_POOL_ID: ${env:OLD_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${env:OLD_COGNITO_CLIENT_ID}
+
+functions:
+  migrateUser:
+    handler: migrate/lookupUser.lookupUser
