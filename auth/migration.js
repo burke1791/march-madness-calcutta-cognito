@@ -13,6 +13,10 @@ export async function migrateUser(event, context, callback) {
   let username = event.userName;
   let password = event.request.password;
 
+  // const lambdaParams = {
+  //   FunctionName: 
+  // }
+
   let user = await authenticateUser(username, password);
 
   if (user) {
@@ -32,8 +36,15 @@ export async function migrateUser(event, context, callback) {
 
 async function authenticateUser(username, password) {
   const cisp = new AWS.CognitoIdentityServiceProvider({ region: 'us-east-1' });
+  const sts = new AWS.STS();
 
   try {
+    const creds = sts.assumeRole({
+      RoleArn: 'arn:aws:iam::329156245350:role/lambda-migrate-user'
+    });
+
+    console.log(creds);
+    
     let resAuth = await cisp.adminInitiateAuth({
       AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
       AuthParameters: {
