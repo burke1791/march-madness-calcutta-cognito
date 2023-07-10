@@ -10,6 +10,8 @@ const oldUserPoolConfig = {
 export async function migrateUser(event, context, callback) {
   callbackWaitsForEmptyEventLoopFalse(context);
 
+  console.log(event);
+
   let username = event.userName;
   let password = event.request.password;
 
