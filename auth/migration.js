@@ -76,7 +76,9 @@ function initCisp(creds) {
 
     const cisp = new AWS.CognitoIdentityServiceProvider({
       region: 'us-east-1',
-      credentials: creds
+      accessKeyId: creds.AccessKeyId,
+      secretAccessKey: creds.SecretAccessKey,
+      sessionToken: creds.SessionToken
     });
 
     return cisp;
