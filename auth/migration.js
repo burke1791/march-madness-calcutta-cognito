@@ -20,7 +20,7 @@ export async function migrateUser(event, context, callback) {
   const creds = await assumeRole(roleArn, 'migrate-user');
   if (creds === null) throw new Error('Unable to assume role');
 
-  const cisp = initCisp(creds);
+  const cisp = initCisp(creds?.Credentials);
   if (cisp === null) throw new Error('Could not instantiate CognitoIdentityServiceProvider');
 
   if (event.triggerSource === 'UserMigration_Authentication') {
@@ -72,9 +72,11 @@ async function assumeRole(roleArn, sessionName) {
 
 function initCisp(creds) {
   try {
+    if (!creds) throw new Error('Invalid creds');
+
     const cisp = new AWS.CognitoIdentityServiceProvider({
       region: 'us-east-1',
-      credentials: creds.Credentials
+      credentials: creds
     });
 
     return cisp;
