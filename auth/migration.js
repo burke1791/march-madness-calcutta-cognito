@@ -7,21 +7,29 @@ const oldUserPoolConfig = {
   REGION: 'us-east-1'
 };
 
+const roleArn = 'arn:aws:iam::329156245350:role/lambda-migrate-user';
+
 export async function migrateUser(event, context, callback) {
   callbackWaitsForEmptyEventLoopFalse(context);
 
   console.log(event);
 
-  let username = event.userName;
-  let password = event.request.password;
+  const username = event.userName;
+  const password = event.request.password;
 
-  // const lambdaParams = {
-  //   FunctionName:
-  // }
+  const creds = await assumeRole(roleArn, 'migrate-user');
+  if (creds === null) throw new Error('Unable to assume role');
 
-  let user = await authenticateUser(username, password);
+  const cisp = initCisp(creds);
+  if (cisp === null) throw new Error('Could not instantiate CognitoIdentityServiceProvider');
 
-  if (user) {
+  if (event.triggerSource === 'UserMigration_Authentication') {
+    const auth = await authenticateUser(username, password, cisp);
+    if (auth.code && auth.message) throw new Error('Could not authenticate');
+
+    const user = await lookupUser(username, cisp);
+    if (user.code && user.message) throw new Error('Unable to find user in pool');
+
     event.response.userAttributes = {
       email: user.email,
       email_verified: true,
@@ -29,14 +37,93 @@ export async function migrateUser(event, context, callback) {
     };
     event.response.finalUserStatus = 'CONFIRMED';
     event.response.messageAction = 'SUPPRESS';
+  } else if (event.triggerSource === 'UserMigration_ForgotPassword') {
+    const user = await lookupUser(username, cisp);
+    if (user.code && user.message) throw new Error('Unable to find user in pool');
 
-    return event;
-  } else {
-    callback(null, 'Bad Password');
+    event.response.userAttributes = {
+      email: user.email,
+      email_verified: true,
+      preferred_username: user.preferred_username
+    };
+    event.response.messageAction = 'SUPPRESS';
+  }
+
+  return event;
+}
+
+async function assumeRole(roleArn, sessionName) {
+  const sts = new AWS.STS();
+
+  try {
+    const creds = await sts.assumeRole({
+      RoleArn: roleArn,
+      RoleSessionName: sessionName
+    }).promise();
+
+    console.log(creds);
+
+    return creds;
+  } catch (error) {
+    console.log(error);
+    return null;
   }
 }
 
-async function authenticateUser(username, password) {
+function initCisp(creds) {
+  try {
+    const cisp = new AWS.CognitoIdentityServiceProvider({
+      region: 'us-east-1',
+      credentials: creds.Credentials
+    });
+
+    return cisp;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+async function authenticateUser(username, password, cisp) {
+  try {
+    const auth = await cisp.adminInitiateAuth({
+      AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
+      AuthParameters: {
+        USERNAME: username,
+        PASSWORD: password
+      },
+      ClientId: oldUserPoolConfig.CLIENT_ID,
+      UserPoolId: oldUserPoolConfig.USER_POOL_ID
+    }).promise();
+
+    console.log(auth);
+
+    return auth;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+async function lookupUser(username, cisp) {
+  try {
+    const user = await cisp.adminGetUser({
+      UserPoolId: oldUserPoolConfig.USER_POOL_ID,
+      Username: username
+    }).promise();
+
+    console.log(user);
+
+    return user;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+
+/*
+async function authenticateUser2(username, password) {
   const sts = new AWS.STS();
 
   console.log('username', username);
@@ -97,3 +184,4 @@ async function authenticateUser(username, password) {
     return error;
   }
 }
+*/
