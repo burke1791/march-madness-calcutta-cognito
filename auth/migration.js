@@ -17,39 +17,44 @@ export async function migrateUser(event, context, callback) {
   const username = event.userName;
   const password = event.request.password;
 
-  const creds = await assumeRole(roleArn, 'migrate-user');
-  if (creds === null) throw new Error('Unable to assume role');
+  try {
+    const creds = await assumeRole(roleArn, 'migrate-user');
+    if (creds === null) throw new Error('Unable to assume role');
 
-  const cisp = initCisp(creds?.Credentials);
-  if (cisp === null) throw new Error('Could not instantiate CognitoIdentityServiceProvider');
+    const cisp = initCisp(creds?.Credentials);
+    if (cisp === null) throw new Error('Could not instantiate CognitoIdentityServiceProvider');
 
-  if (event.triggerSource === 'UserMigration_Authentication') {
-    const auth = await authenticateUser(username, password, cisp);
-    if ((auth == null) || (auth.code && auth.message)) throw new Error('Could not authenticate');
+    if (event.triggerSource === 'UserMigration_Authentication') {
+      const auth = await authenticateUser(username, password, cisp);
+      if ((auth == null) || (auth.code && auth.message)) throw new Error('Could not authenticate');
 
-    const user = await lookupUser(username, cisp);
-    if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
+      const user = await lookupUser(username, cisp);
+      if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
-    event.response.userAttributes = {
-      email: user.email,
-      email_verified: true,
-      preferred_username: user.preferred_username
-    };
-    event.response.finalUserStatus = 'CONFIRMED';
-    event.response.messageAction = 'SUPPRESS';
-  } else if (event.triggerSource === 'UserMigration_ForgotPassword') {
-    const user = await lookupUser(username, cisp);
-    if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
+      event.response.userAttributes = {
+        email: user.email,
+        email_verified: true,
+        preferred_username: user.preferred_username
+      };
+      event.response.finalUserStatus = 'CONFIRMED';
+      event.response.messageAction = 'SUPPRESS';
+    } else if (event.triggerSource === 'UserMigration_ForgotPassword') {
+      const user = await lookupUser(username, cisp);
+      if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
-    event.response.userAttributes = {
-      email: user.email,
-      email_verified: true,
-      preferred_username: user.preferred_username
-    };
-    event.response.messageAction = 'SUPPRESS';
+      event.response.userAttributes = {
+        email: user.email,
+        email_verified: true,
+        preferred_username: user.preferred_username
+      };
+      event.response.messageAction = 'SUPPRESS';
+    }
+
+    return event;
+  } catch (error) {
+    console.log(error);
+    return event;
   }
-
-  return event;
 }
 
 async function assumeRole(roleArn, sessionName) {
