@@ -32,9 +32,9 @@ export async function migrateUser(event, context, callback) {
       if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
       event.response.userAttributes = {
-        email: user.email,
+        email: user.UserAttributes.find(e => e.Name === 'email').Value,
         email_verified: true,
-        preferred_username: user.preferred_username
+        preferred_username: user.UserAttributes.find(e => e.Name === 'preferred_username').Value
       };
       event.response.finalUserStatus = 'CONFIRMED';
       event.response.messageAction = 'SUPPRESS';
@@ -43,12 +43,14 @@ export async function migrateUser(event, context, callback) {
       if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
       event.response.userAttributes = {
-        email: user.email,
+        email: user.UserAttributes.find(e => e.Name === 'email').Value,
         email_verified: true,
-        preferred_username: user.preferred_username
+        preferred_username: user.UserAttributes.find(e => e.Name === 'preferred_username').Value
       };
       event.response.messageAction = 'SUPPRESS';
     }
+
+    console.log(event);
 
     return event;
   } catch (error) {
