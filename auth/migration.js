@@ -37,6 +37,9 @@ export async function migrateUser(event, context, callback) {
 async function authenticateUser(username, password) {
   const sts = new AWS.STS();
 
+  console.log('username', username);
+  console.log('password', password);
+
   try {
     const assumedRole = await sts.assumeRole({
       RoleArn: 'arn:aws:iam::329156245350:role/lambda-migrate-user',
@@ -66,6 +69,8 @@ async function authenticateUser(username, password) {
       ClientId: oldUserPoolConfig.CLIENT_ID,
       UserPoolId: oldUserPoolConfig.USER_POOL_ID
     }).promise();
+
+    console.log(resAuth);
 
     if (resAuth.code && resAuth.message) {
       return undefined;
