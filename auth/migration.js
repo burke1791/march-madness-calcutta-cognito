@@ -25,10 +25,10 @@ export async function migrateUser(event, context, callback) {
 
   if (event.triggerSource === 'UserMigration_Authentication') {
     const auth = await authenticateUser(username, password, cisp);
-    if (auth.code && auth.message) throw new Error('Could not authenticate');
+    if ((auth == null) || (auth.code && auth.message)) throw new Error('Could not authenticate');
 
     const user = await lookupUser(username, cisp);
-    if (user.code && user.message) throw new Error('Unable to find user in pool');
+    if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
     event.response.userAttributes = {
       email: user.email,
@@ -39,7 +39,7 @@ export async function migrateUser(event, context, callback) {
     event.response.messageAction = 'SUPPRESS';
   } else if (event.triggerSource === 'UserMigration_ForgotPassword') {
     const user = await lookupUser(username, cisp);
-    if (user.code && user.message) throw new Error('Unable to find user in pool');
+    if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
     event.response.userAttributes = {
       email: user.email,
