@@ -8,6 +8,7 @@ on:
 jobs:
   base_deploy:
     name: Deploy base service
+    environment: prod
     runs-on: ubuntu-latest
     
     steps:
@@ -27,8 +28,8 @@ env:
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_HOST: ${{ secrets.DB_HOST_PROD }}
+  DB_HOST: ${{ secrets.DB_HOST }}
   DB_PORT: ${{ secrets.DB_PORT }}
-  AWS_PEER_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID_PROD }}
+  AWS_PEER_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   OLD_USER_POOL_ID: ${{ secrets.OLD_USER_POOL_ID }}
   OLD_COGNITO_CLIENT_ID: ${{ secrets.OLD_COGNITO_CLIENT_ID }}
