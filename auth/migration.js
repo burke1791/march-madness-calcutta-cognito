@@ -32,7 +32,7 @@ export async function migrateUser(event, context, callback) {
       if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
       event.response.userAttributes = {
-        email: user.UserAttributes.find(e => e.Name === 'email').Value,
+        email: String(user.UserAttributes.find(e => e.Name === 'email').Value).toLower(),
         email_verified: true,
         preferred_username: user.UserAttributes.find(e => e.Name === 'preferred_username').Value
       };
