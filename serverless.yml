@@ -69,6 +69,13 @@ functions:
       - cognitoUserPool:
           pool: CalcuttaPool
           trigger: UserMigration
+
+  preAuthTrigger:
+    handler: auth/preAuth.preAuthTrigger
+    events:
+      - cognitoUserPool:
+          pool: CalcuttaPool
+          trigger: PreAuthentication
   
 resources:
   - ${file(resources/cognito.yml)}
