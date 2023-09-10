@@ -14,6 +14,7 @@ export async function migrateUser(event, context, callback) {
 
   console.log(event);
 
+  // email and password
   const username = event.userName;
   const password = event.request.password;
 
@@ -32,7 +33,7 @@ export async function migrateUser(event, context, callback) {
       if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
       event.response.userAttributes = {
-        email: user.UserAttributes.find(e => e.Name === 'email').Value,
+        email: username,
         email_verified: true,
         preferred_username: user.UserAttributes.find(e => e.Name === 'preferred_username').Value
       };
@@ -43,7 +44,7 @@ export async function migrateUser(event, context, callback) {
       if ((user == null) || (user.code && user.message)) throw new Error('Unable to find user in pool');
 
       event.response.userAttributes = {
-        email: user.UserAttributes.find(e => e.Name === 'email').Value,
+        email: username,
         email_verified: true,
         preferred_username: user.UserAttributes.find(e => e.Name === 'preferred_username').Value
       };
