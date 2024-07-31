@@ -16,7 +16,7 @@ jobs:
       - name: use nodejs
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
       - run: npm install -g serverless
       - run: npm install
       - run: serverless deploy -s $STAGE_NAME
