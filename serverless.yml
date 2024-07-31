@@ -25,6 +25,10 @@ provider:
       Action: sts:AssumeRole
       Resource: arn:aws:iam::329156245350:role/lambda-migrate-user
   environment:
+    PGUSER: ${env:PG_USER}
+    PGPASSWORD: ${env:PG_PASSWORD}
+    PGHOST: ${env:PG_HOST}
+    PGDATABASE: ${env:PG_DATABASE}
     DB_NAME: ${env:DB_NAME}
     DB_USER: ${env:DB_USER}
     DB_PASSWORD: ${env:DB_PASSWORD}

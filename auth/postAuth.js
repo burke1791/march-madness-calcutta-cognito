@@ -1,26 +1,22 @@
+import pg from 'pg';
 import { callbackWaitsForEmptyEventLoopFalse } from '../utilities/common';
-import sql from 'mssql';
-const connection = require('../utilities/db').connection;
+
+const { Client } = pg;
+
+const client = new Client();
 
 export async function syncUserInDatabase(event, context, callback) {
   callbackWaitsForEmptyEventLoopFalse(context);
 
-  let email = event.request.userAttributes.email;
-  let alias = event.request.userAttributes.preferred_username;
-  let cognitoSub = event.request.userAttributes.sub;
-
-  if (!connection.isConnected) {
-    await connection.createConnection();
-  }
-
-  const request = new sql.Request();
-
-  request.input('Email', sql.VarChar(256), email);
-  request.input('Alias', sql.VarChar(50), alias);
-  request.input('CognitoSub', sql.VarChar(256), cognitoSub);
+  const email = event.request.userAttributes.email;
+  const alias = event.request.userAttributes.preferred_username;
+  const cognitoSub = event.request.userAttributes.sub;
 
   try {
-    await request.execute('dbo.up_SyncUserWithCognito');
+    await client.connect();
+
+    const res = await client.query('Call public.up_sync_user_with_cognito($1, $2, $3)', [email, alias, cognitoSub]);
+    console.log(res);
   } catch (error) {
     console.log(error);
   }
